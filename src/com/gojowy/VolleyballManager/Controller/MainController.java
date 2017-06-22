@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
@@ -68,7 +69,9 @@ public class MainController implements Initializable {
                 try {
                     RoundController controller = new RoundController();
                     controller.setTeamList(teamsList);
-                    scene = new Scene(FXMLLoader.load(getClass().getResource("../View/Round.fxml")), 600, 600);
+                    Parent root = FXMLLoader.load(getClass().getResource("../View/Round.fxml"));
+
+                    scene = new Scene(root, 600, 600);
                     Stage stage = new Stage();
                     stage.setTitle("Round");
 
