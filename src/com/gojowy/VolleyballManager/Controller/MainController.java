@@ -69,9 +69,13 @@ public class MainController implements Initializable {
                 try {
                     RoundController controller = new RoundController();
                     controller.setTeamList(teamsList);
-                    Parent root = FXMLLoader.load(getClass().getResource("../View/Round.fxml"));
 
-                    scene = new Scene(root, 600, 600);
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../View/Round.fxml"));
+                    loader.setController(controller);
+                    Parent root = loader.load();//FXMLLoader.load(getClass().getResource("../View/Round.fxml"));
+
+
+                    scene = new Scene(root, 500, 600);
                     Stage stage = new Stage();
                     stage.setTitle("Round");
 

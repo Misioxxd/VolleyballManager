@@ -13,6 +13,7 @@ public class Match {
     public Match(Team firstTeam, Team secondTeam){
         this.firstTeam = firstTeam;
         this.secondTeam = secondTeam;
+
     }
 
     public void proceed(){

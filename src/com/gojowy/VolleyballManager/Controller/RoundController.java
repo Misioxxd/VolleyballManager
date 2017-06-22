@@ -9,6 +9,7 @@ import javafx.fxml.Initializable;
 
 import javafx.scene.control.Label;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -28,7 +29,7 @@ public class RoundController implements Initializable {
     @FXML
     public Label matchLabel5;
 
-    private List<Label> labelList ;
+    private List<Label> labelList = new ArrayList<>();
     protected Round round ;
     protected List<Team> teamList;
     protected List<Match> matchList;
@@ -42,13 +43,13 @@ public class RoundController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         Round round = new Round(this.teamList,1);
         round.start();
-//        this.matchList = round.getMatchList();
-//        this.assignLabelTolist();
-//        int i=0;
-//        for (Match match: matchList) {
-//           this.labelList.get(i).setText(match.showMatchTeams());
-//            i++;
-//        }
+        this.matchList = round.getMatchList();
+        this.assignLabelTolist();
+        int i=0;
+        for (Match match: matchList) {
+           this.labelList.get(i).setText(match.showMatchTeams());
+            i++;
+        }
 
     }
     private void assignLabelTolist()
