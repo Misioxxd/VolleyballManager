@@ -1,13 +1,17 @@
 package com.gojowy.VolleyballManager.Controller;
 
-import com.gojowy.VolleyballManager.Main;
 import com.gojowy.VolleyballManager.Model.Match;
 import com.gojowy.VolleyballManager.Model.Round;
 import com.gojowy.VolleyballManager.Model.Team;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +32,10 @@ public class RoundController implements Initializable {
     public Label matchLabel4;
     @FXML
     public Label matchLabel5;
+    @FXML
+    public Button backButton;
+    @FXML
+    public Button showResultButton;
 
     private List<Label> labelList = new ArrayList<>();
     protected Round round ;
@@ -47,9 +55,11 @@ public class RoundController implements Initializable {
         this.assignLabelTolist();
         int i=0;
         for (Match match: matchList) {
-           this.labelList.get(i).setText(match.showMatchTeams());
+            setTextInlabels(match.showMatchTeams(),i);
             i++;
         }
+        onClickBackButton();
+        onClickShowResultsButton(round);
 
     }
     private void assignLabelTolist()
@@ -60,4 +70,40 @@ public class RoundController implements Initializable {
         this.labelList.add(matchLabel4);
         this.labelList.add(matchLabel5);
     }
+    public void onClickBackButton()
+    {
+        this.backButton.setOnAction(new EventHandler<ActionEvent>()  {
+            @Override
+            public void handle(ActionEvent event) {
+
+                Stage stage = (Stage) backButton.getScene().getWindow();
+                stage.close();
+            }
+        });
+    }
+    public void onClickShowResultsButton(Round round){
+        this.showResultButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+
+                showResult();
+                showResultButton.setDisable(true);
+                round.setResultsAfter();
+
+
+            }
+        });
+    }
+    private void setTextInlabels(String text,int labelNumber){
+        this.labelList.get(labelNumber).setText(text);
+    }
+    private void showResult(){
+        int i =0;
+        for (Match match: matchList) {
+            match.proceed();
+            setTextInlabels(match.showTeamWithResult(),i);
+            i++;
+        }
+    }
+
 }

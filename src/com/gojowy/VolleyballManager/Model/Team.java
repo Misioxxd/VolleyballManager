@@ -12,7 +12,9 @@ public class Team {
     protected int score;
     protected int win;
     protected int loose;
-    protected int place;
+    protected int id;
+    protected int matchScore;
+    protected int matches;
 
     public int getStrength() {
         return strength;
@@ -21,21 +23,30 @@ public class Team {
     protected int strength;
     protected List<Player> playerList;
 
-    public Team(String name, List playerList) {
+    public Team(String name, List playerList,int i) {
         this.name = name;
         this.score = 0;
         this.win = 0;
         this.loose = 0;
-        this.place = 1;
+        this.id = i;
+        this.matches=0;
         this.playerList = playerList;
         this.strength = countStrength();
     }
     public void winner(){
         this.win++;
         this.score+=3;
+        this.matchScore = 3;
+        this.matches++;
     }
     public void looser(){
         this.loose++;
+        this.matchScore = getRandScore();
+        this.matches++;
+    }
+    private int getRandScore(){
+        Random rand = new Random();
+        return rand.nextInt(3);
     }
 
     private int countStrength(){
@@ -60,9 +71,18 @@ public class Team {
     public int getLoose() {
         return loose;
     }
+    public int getMatches(){
+        return matches;
+    }
+    public int getID() {
+        return id;
+    }
 
-    public int getPlace() {
-        return place;
+    public void setMatchScore(int matchScore){
+        this.matchScore = matchScore;
+    }
+    public int getMatchScore(){
+        return this.matchScore;
     }
 
     public List<Player> getPlayerList() {

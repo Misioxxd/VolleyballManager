@@ -29,17 +29,17 @@ public class TeamController {
         generateTeamList();
     }
 
-    private void generateTeam()
+    private void generateTeam(int i)
     {
         String name = this.teamData.get(0);
         this.teamData.remove(0);
-        this.teamList.add(new Team(name,playerController.getPlayersForTeam()));
+        this.teamList.add(new Team(name,playerController.getPlayersForTeam(),i));
     }
     private void generateTeamList()
     {
         for (int i=0;i<10;i++)
         {
-            generateTeam();
+            generateTeam(i);
 
         }
     }

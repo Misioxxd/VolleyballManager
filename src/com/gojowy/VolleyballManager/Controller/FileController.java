@@ -22,6 +22,7 @@ public class FileController {
             this.filePath = filePath;
             this.file = new File(this.filePath);
             gatherData();
+            System.out.println("Data was correctly loaded");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

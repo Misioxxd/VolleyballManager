@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,7 +16,9 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import sun.plugin.javascript.navig.Anchor;
 
 import java.io.IOException;
 import java.net.URL;
@@ -28,6 +31,8 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
 
     @FXML
+    public AnchorPane stageMain;
+    @FXML
     public TableView<Team> scoreboard;
     @FXML
     public TableColumn<Team, String> teamName;
@@ -36,12 +41,16 @@ public class MainController implements Initializable {
     @FXML
     public TableColumn<Team, String> teamLoose;
     @FXML
-    public TableColumn<Team, String> teamPlace;
+    public TableColumn<Team, String> teamMatches;
     @FXML
     public TableColumn<Team, String> teamPoints;
     @FXML
     public Button nextRoundButton;
 
+    private void handleButtonAction(ActionEvent event) {
+
+        System.out.println(stageMain.getScene());// Gives you the scene
+    }
 
     private ObservableList<Team> teamsList;
 
@@ -49,14 +58,7 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.teamsList = getTeamList();
-        teamName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        teamWin.setCellValueFactory(new PropertyValueFactory<>("win"));
-        teamLoose.setCellValueFactory(new PropertyValueFactory<>("loose"));
-        teamPlace.setCellValueFactory(new PropertyValueFactory<>("place"));
-        teamPoints.setCellValueFactory(new PropertyValueFactory<>("score"));
-        this.scoreboard.setItems(this.teamsList);
-        this.scoreboard.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
+        setTable();
         buttonActionOpenRoundWindow();
     }
 
@@ -66,27 +68,38 @@ public class MainController implements Initializable {
             @Override
             public void handle(ActionEvent event) {
                 Scene scene = null;
+
                 try {
                     RoundController controller = new RoundController();
                     controller.setTeamList(teamsList);
-
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../View/Round.fxml"));
                     loader.setController(controller);
                     Parent root = loader.load();//FXMLLoader.load(getClass().getResource("../View/Round.fxml"));
-
-
-                    scene = new Scene(root, 500, 600);
+                    root.autosize();
                     Stage stage = new Stage();
+                    scene = new Scene(root);
                     stage.setTitle("Round");
-
                     stage.setScene(scene);
-
                     stage.show();
+                    scoreboard.refresh();
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
             }
         });
+    }
+
+    private void setTable() {
+        teamName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        teamMatches.setCellValueFactory(new PropertyValueFactory<>("matches"));
+        teamWin.setCellValueFactory(new PropertyValueFactory<>("win"));
+        teamLoose.setCellValueFactory(new PropertyValueFactory<>("loose"));
+
+        teamPoints.setCellValueFactory(new PropertyValueFactory<>("score"));
+        this.scoreboard.setItems(this.teamsList);
+        this.scoreboard.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     private ObservableList<Team> getTeamList() {

@@ -46,6 +46,11 @@ public class Match {
     {
         return this.firstTeam.name+" vs "+this.secondTeam.name;
     }
+    private String showResults(){return this.firstTeam.getMatchScore()+":"+this.secondTeam.getMatchScore();}
+    public String showTeamWithResult(){
+        String teamAndResult = showMatchTeams()+"\n"+ showResults();
+        return teamAndResult;
+    }
     public Team getFirstTeam(){
         return this.firstTeam;
     }
