@@ -3,6 +3,7 @@ package com.gojowy.VolleyballManager.Model;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.TableView;
 
 import java.util.*;
 
@@ -16,55 +17,44 @@ public class Round {
     protected final int maxMatchNumber = 5;
     protected List<Team> afterRoundTeamList;
 
-
-    public Round(List<Team> teamList, int number) {
-
-
+    /**
+     *
+     * @param teamList
+     * @param roundNumber
+     */
+    public Round(List<Team> teamList, int roundNumber) {
         this.afterRoundTeamList = teamList;
         this.beforeRoundTeamList = FXCollections.observableArrayList(teamList);
-        this.number = number;
+        this.number = roundNumber;
     }
 
-
+    /**
+     * Starting round
+     */
     public void start() {
         createMatchList();
     }
 
+    /**
+     * Creating match based on random Teams
+     */
     private void createMatchList() {
         try {
             for (int i = 0; i < maxMatchNumber; i++) {
                 Team first = getRandomTeam();
                 Team second = getRandomTeam();
                 this.matchList.add(new Match(first, second));
-
             }
-            System.out.println("Match list created succesfull");
+            System.out.println("Match list created succesfull in round " + this.number);
         } catch (Exception $e) {
             System.out.println($e.getMessage());
         }
     }
 
-    public void setResultsAfter() {
-        assignTeamsAfterMatch();
-    }
-
-    private void assignTeamsAfterMatch() {
-
-        for (Match match : matchList) {
-            for (Team team : afterRoundTeamList) {
-                if (match.firstTeam.name.equals(team.name)) {
-                    team = match.firstTeam;
-                }
-
-                if (match.secondTeam.name.equals(team.name)) {
-                    team = match.secondTeam;
-                }
-
-            }
-        }
-
-    }
-
+    /**
+     * Return random team from list
+     * @return Team
+     */
     private Team getRandomTeam() {
         Random random = new Random();
         int randomTeamIndex = random.nextInt(this.beforeRoundTeamList.size());

@@ -1,14 +1,15 @@
 package com.gojowy.VolleyballManager.Controller;
 
-import com.gojowy.VolleyballManager.Model.Round;
+import com.gojowy.VolleyballManager.Model.DataGather;
+import com.gojowy.VolleyballManager.Model.Player;
 import com.gojowy.VolleyballManager.Model.Team;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,12 +17,11 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import sun.plugin.javascript.navig.Anchor;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -30,8 +30,6 @@ import java.util.ResourceBundle;
  */
 public class MainController implements Initializable {
 
-    @FXML
-    public AnchorPane stageMain;
     @FXML
     public TableView<Team> scoreboard;
     @FXML
@@ -47,67 +45,190 @@ public class MainController implements Initializable {
     @FXML
     public Button nextRoundButton;
 
-    private void handleButtonAction(ActionEvent event) {
-
-        System.out.println(stageMain.getScene());// Gives you the scene
-    }
-
-    private ObservableList<Team> teamsList;
-
+    private ObservableList<Team> teamsList = FXCollections.observableArrayList();
+    private int maxRound;
+    private int currentRound = 1;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.teamsList = getTeamList();
+        generate();
         setTable();
-        buttonActionOpenRoundWindow();
+        buttonActionOpenNewWindow();
     }
 
-    public void buttonActionOpenRoundWindow() {
+    /**
+     * Open new window after button click after button click
+     */
+    public void buttonActionOpenNewWindow() {
         this.nextRoundButton.setOnAction(new EventHandler<ActionEvent>() {
-
             @Override
             public void handle(ActionEvent event) {
-                Scene scene = null;
-
-                try {
-                    RoundController controller = new RoundController();
-                    controller.setTeamList(teamsList);
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../View/Round.fxml"));
-                    loader.setController(controller);
-                    Parent root = loader.load();//FXMLLoader.load(getClass().getResource("../View/Round.fxml"));
-                    root.autosize();
-                    Stage stage = new Stage();
-                    scene = new Scene(root);
-                    stage.setTitle("Round");
-                    stage.setScene(scene);
-                    stage.show();
-                    scoreboard.refresh();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (!isItEnd()) {
+                    createRoundWindow();
+                } else {
+                    createWinnerWindow();
                 }
 
             }
         });
     }
 
+    /**
+     * Open Round Window
+     */
+    private void createRoundWindow() {
+        try {
+            RoundController controller = new RoundController();
+            setControllersValue(controller);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../View/Round.fxml"));
+            loader.setController(controller);
+            Parent root = loader.load();//FXMLLoader.load(getClass().getResource("../View/Round.fxml"));
+            root.autosize();
+            Stage stage = new Stage();
+            Scene scene = new Scene(root);
+            stage.setTitle("Round");
+            stage.setScene(scene);
+            stage.show();
+            currentRound++;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Open Winner Window
+     */
+    private void createWinnerWindow() {
+        try {
+            WinnerController winnerController = new WinnerController();
+            winnerController.setWinners(teamsList.get(0));
+            Stage mainStage = (Stage) nextRoundButton.getScene().getWindow();
+            mainStage.close();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../View/Winner.fxml"));
+            loader.setController(winnerController);
+            Parent root = loader.load();//FXMLLoader.load(getClass().getResource("../View/Round.fxml"));
+            root.autosize();
+            Stage stage = new Stage();
+            Scene scene = new Scene(root);
+            stage.setTitle("Winner");
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Setting values(teamList,scoreboard,teamPoints,currentRound) to controller
+     *
+     * @param controller RoundController
+     */
+    private void setControllersValue(RoundController controller) {
+        controller.setTeamList(teamsList);
+        controller.setViewTable(scoreboard);
+        controller.setSortColumn(teamPoints);
+        controller.setRoundNumber(currentRound);
+    }
+
+    /**
+     * Setting teams into View Table
+     */
     private void setTable() {
         teamName.setCellValueFactory(new PropertyValueFactory<>("name"));
         teamMatches.setCellValueFactory(new PropertyValueFactory<>("matches"));
         teamWin.setCellValueFactory(new PropertyValueFactory<>("win"));
         teamLoose.setCellValueFactory(new PropertyValueFactory<>("loose"));
-
         teamPoints.setCellValueFactory(new PropertyValueFactory<>("score"));
         this.scoreboard.setItems(this.teamsList);
         this.scoreboard.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
-    private ObservableList<Team> getTeamList() {
-        TeamController team = new TeamController();
-        return team.getTeamList();
+    /**
+     * Gathering teams data from file
+     *
+     * @return List<String> teamsData
+     */
+    private List<String> getTeamDataFromFile() {
+        DataGather dataFromFile = new DataGather("Teams.txt");
+        return dataFromFile.getData();
     }
 
-    public ObservableList<Team> getTeams() {
-        return teamsList;
+    /**
+     * Gathering players data from file
+     *
+     * @return List<String> playersData
+     */
+    private List<String> getPlayerDataFromFile() {
+        DataGather playersDataGather = new DataGather("Players.txt");
+        return playersDataGather.getData();
     }
+
+    /**
+     * Generating teams and players lists
+     */
+    private void generate() {
+        List<String> teamsFromFile = new ArrayList<>(getTeamDataFromFile());
+        List<String> playersFromFile = new ArrayList<>(getPlayerDataFromFile());
+        generateTeamList(teamsFromFile, playersFromFile);
+
+    }
+
+    /**
+     * Returning list of 5 players to insert into Team
+     *
+     * @param playersData from file
+     * @return List<Player>
+     */
+    private List<Player> getPlayersForTeam(List<String> playersData) {
+        List<Player> playerList = new ArrayList<>();
+        List<String> playerData = playersData;
+        for (int i = 0; i < 5; i++) {
+            playerList.add(new Player(playerData.get(i)));
+            playerData.remove(i);
+        }
+        return playerList;
+    }
+
+    /**
+     * Generating team list
+     *
+     * @param iteration
+     * @param playersList
+     * @param teamData    from file
+     */
+    private void generateTeam(int iteration, List<Player> playersList, List<String> teamData) {
+        String name = teamData.get(0);
+        teamData.remove(0);
+        this.teamsList.add(new Team(name, playersList, iteration));
+    }
+
+    /**
+     * Looping to generate teams
+     *
+     * @param teamData    from file
+     * @param playersData from file
+     */
+    private void generateTeamList(List<String> teamData, List<String> playersData) {
+        for (int i = 0; i < 10; i++) {
+            generateTeam(i, getPlayersForTeam(playersData), teamData);
+
+        }
+    }
+
+    /**
+     * check if the maxRound is obtained
+     *
+     * @return boolean
+     */
+    private boolean isItEnd() {
+        if (currentRound > maxRound) {
+            return true;
+        } else
+            return false;
+    }
+
+    public void setMaxRound(int maxRound) {
+        this.maxRound = maxRound;
+    }
+
 }
