@@ -40,7 +40,7 @@ public class Round {
      */
     private void createMatchList() {
         try {
-            for (int i = 0; i < this.beforeRoundTeamList.size(); i++) {
+            for (int i = 0; i < this.afterRoundTeamList.size()/2; i++) {
                 Team first = getRandomTeam();
                 Team second = getRandomTeam();
                 this.matchList.add(new Match(first, second));

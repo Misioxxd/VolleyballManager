@@ -63,6 +63,7 @@ public class RoundController implements Initializable {
         this.matchList = round.getMatchList();
         this.assignLabelTolist();
         int i = 0;
+
         for (Match match : matchList) {
             setTextInlabels(match.showMatchTeams(), i);
             i++;
@@ -128,8 +129,8 @@ public class RoundController implements Initializable {
      */
     private void showResult() {
         int i = 0;
+        matchList.forEach(match -> match.proceed());
         for (Match match : matchList) {
-            match.proceed();
             setTextInlabels(match.showTeamWithResult(), i);
             i++;
         }
