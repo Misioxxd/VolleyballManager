@@ -100,7 +100,7 @@ public class RoundController implements Initializable {
 
     /**
      * Showing results in labels after button click
-     * @param round
+     * @param round instance of round
      */
     public void onClickShowResultsButton(Round round) {
         this.showResultButton.setOnAction(new EventHandler<ActionEvent>() {

@@ -30,7 +30,7 @@ public class Main extends Application {
 
     /**
      *  Run program with passed  arguments
-     * @param args
+     * @param args passed when program starts
      */
     public static void main(String[] args)
     {

@@ -17,30 +17,34 @@ public class DataGather {
 
     /**
      * Prepare to gather data
-     * @param filePath
+     * @param filePath Path to the file
      */
     public DataGather(String filePath) {
+        this.filePath = filePath;
+        this.file = new File(this.filePath);
+        showMessage(filePath);
+    }
+
+
+        /**
+         * Gather data from file
+         * @throws FileNotFoundException throw Exception when file is not found
+         */
+
+    public void gatherData() throws FileNotFoundException {
         try {
-            this.filePath = filePath;
-            this.file = new File(this.filePath);
-            gatherData();
-            System.out.println("Data from file "+ filePath +" was correctly loaded");
+            Scanner scan = new Scanner(this.file);
+            while (scan.hasNextLine()) {
+                this.data.add(scan.nextLine());
+            }
+            scan.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Gather data from file
-     * @throws FileNotFoundException
-     */
-    private void gatherData() throws FileNotFoundException {
-        Scanner scan = new Scanner(this.file);
-        while (scan.hasNextLine()) {
-
-            this.data.add(scan.nextLine());
-        }
-        scan.close();
+    private void showMessage(String filePath) {
+        System.out.println("Data from file " + filePath + " was correctly loaded");
     }
 
     public List<String> getData() {

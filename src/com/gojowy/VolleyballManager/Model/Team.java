@@ -22,9 +22,9 @@ public class Team {
     /**
      * Create new Team
      *
-     * @param name
-     * @param playerList
-     * @param iterator
+     * @param name name of team from file
+     * @param playerList generated player list
+     * @param iterator team id
      */
     public Team(String name, List playerList, int iterator) {
         this.name = name;

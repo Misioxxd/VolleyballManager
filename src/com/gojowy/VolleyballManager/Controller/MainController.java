@@ -19,6 +19,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -51,9 +52,13 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        generate();
-        setTable();
-        buttonActionOpenNewWindow();
+        try {
+            generate();
+            setTable();
+            buttonActionOpenNewWindow();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -148,8 +153,9 @@ public class MainController implements Initializable {
      *
      * @return List<String> teamsData
      */
-    private List<String> getTeamDataFromFile() {
+    private List<String> getTeamDataFromFile() throws FileNotFoundException {
         DataGather dataFromFile = new DataGather("Teams.txt");
+        dataFromFile.gatherData();
         return dataFromFile.getData();
     }
 
@@ -158,15 +164,16 @@ public class MainController implements Initializable {
      *
      * @return List<String> playersData
      */
-    private List<String> getPlayerDataFromFile() {
+    private List<String> getPlayerDataFromFile() throws FileNotFoundException {
         DataGather playersDataGather = new DataGather("Players.txt");
+        playersDataGather.gatherData();
         return playersDataGather.getData();
     }
 
     /**
      * Generating teams and players lists
      */
-    private void generate() {
+    private void generate() throws FileNotFoundException {
         List<String> teamsFromFile = new ArrayList<>(getTeamDataFromFile());
         List<String> playersFromFile = new ArrayList<>(getPlayerDataFromFile());
         generateTeamList(teamsFromFile, playersFromFile);

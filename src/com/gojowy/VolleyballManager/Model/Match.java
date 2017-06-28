@@ -13,8 +13,8 @@ public class Match {
     /**
      * Creating match
      *
-     * @param firstTeam
-     * @param secondTeam
+     * @param firstTeam random team when creating matchList
+     * @param secondTeam random team when creating matchList
      */
     public Match(Team firstTeam, Team secondTeam) {
         this.firstTeam = firstTeam;
@@ -38,7 +38,6 @@ public class Match {
 
     /**
      * Return number of team who wins
-     *
      * @return int
      */
     private int getWinner() {

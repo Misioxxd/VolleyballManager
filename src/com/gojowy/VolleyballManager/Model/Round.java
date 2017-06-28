@@ -19,8 +19,8 @@ public class Round {
 
     /**
      *
-     * @param teamList
-     * @param roundNumber
+     * @param teamList list from ViewTable
+     * @param roundNumber next round Number
      */
     public Round(List<Team> teamList, int roundNumber) {
         this.afterRoundTeamList = teamList;
@@ -40,7 +40,7 @@ public class Round {
      */
     private void createMatchList() {
         try {
-            for (int i = 0; i < maxMatchNumber; i++) {
+            for (int i = 0; i < this.beforeRoundTeamList.size(); i++) {
                 Team first = getRandomTeam();
                 Team second = getRandomTeam();
                 this.matchList.add(new Match(first, second));
