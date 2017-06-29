@@ -33,6 +33,7 @@ public class Round {
      */
     public void start() {
         createMatchList();
+        matchList.forEach(match -> match.proceed());
     }
 
     /**

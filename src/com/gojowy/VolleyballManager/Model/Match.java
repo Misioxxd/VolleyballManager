@@ -13,7 +13,7 @@ public class Match {
     /**
      * Creating match
      *
-     * @param firstTeam random team when creating matchList
+     * @param firstTeam  random team when creating matchList
      * @param secondTeam random team when creating matchList
      */
     public Match(Team firstTeam, Team secondTeam) {
@@ -38,6 +38,7 @@ public class Match {
 
     /**
      * Return number of team who wins
+     *
      * @return int
      */
     private int getWinner() {
@@ -52,20 +53,25 @@ public class Match {
 
     /**
      * Show team in match
+     *
      * @return String
      */
     public String showMatchTeams() {
         return this.firstTeam.name + " vs " + this.secondTeam.name;
     }
+
     /**
      * Show match results
+     *
      * @return String
      */
     private String showResults() {
         return this.firstTeam.getMatchScore() + ":" + this.secondTeam.getMatchScore();
     }
+
     /**
      * Show team and result
+     *
      * @return String
      */
     public String showTeamWithResult() {

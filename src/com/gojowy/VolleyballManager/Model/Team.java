@@ -6,7 +6,7 @@ import java.util.Random;
 /**
  * Created by GM on 5/21/2017.
  */
-public class Team {
+public class Team  {
     protected String name;
     protected final static int maxPlayers = 5;
     protected int score;
@@ -63,6 +63,8 @@ public class Team {
         Random rand = new Random();
         return rand.nextInt(3);
     }
+
+
 
     /**
      * Counting team Strength base on player score

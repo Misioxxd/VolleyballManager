@@ -3,6 +3,7 @@ package com.gojowy.VolleyballManager.Controller;
 import com.gojowy.VolleyballManager.Model.DataGather;
 import com.gojowy.VolleyballManager.Model.Player;
 import com.gojowy.VolleyballManager.Model.Team;
+import com.sun.scenario.effect.impl.prism.PrReflectionPeer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,8 +20,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,123 +32,100 @@ import java.util.ResourceBundle;
 /**
  * Created by GM on 6/2/2017.
  */
-public class MainController implements Initializable {
+public class MainController {
 
-    @FXML
-    public TableView<Team> scoreboard;
-    @FXML
-    public TableColumn<Team, String> teamName;
-    @FXML
-    public TableColumn<Team, String> teamWin;
-    @FXML
-    public TableColumn<Team, String> teamLoose;
-    @FXML
-    public TableColumn<Team, String> teamMatches;
-    @FXML
-    public TableColumn<Team, String> teamPoints;
-    @FXML
-    public Button nextRoundButton;
 
     private ObservableList<Team> teamsList = FXCollections.observableArrayList();
     private int maxRound;
     private int currentRound = 1;
+    protected BufferedReader in;
+    protected PrintWriter out;
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        try {
-            generate();
-            setTable();
-            buttonActionOpenNewWindow();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+    public MainController(int maxRound, BufferedReader in, PrintWriter out) {
+        this.maxRound = maxRound;
+        this.in = in;
+        this.out = out;
+    }
+
+    /**
+     * Start simulations
+     *
+     * @throws IOException
+     */
+    public void proceed() throws IOException {
+        generate();
+        out.println("Simulation started type help to show command list");
+        boolean isNotEnd = true;
+        while (isNotEnd) {
+            switch (in.readLine().toUpperCase()) {
+                case "SHOW SCOREBOARD": {
+                    showScoreboard();
+                    break;
+                }
+                case "QUIT": {
+                    isNotEnd = false;
+                    break;
+                }
+                case "NEXT ROUND": {
+                    RoundController roundController = new RoundController(out, in, currentRound, teamsList);
+                    roundController.proccess();
+                    this.currentRound++;
+                    break;
+                }
+                case "HELP": {
+                    showHelp();
+                    break;
+                }
+                default: {
+                    out.println("Unknown command type help for command list");
+                    break;
+                }
+            }
+
+            isNotEnd = maxRoundAchieved();
+        }
+        if (!maxRoundAchieved()) {
+            showEnd();
         }
     }
 
     /**
-     * Open new window after button click after button click
+     * shows end message
      */
-    public void buttonActionOpenNewWindow() {
-        this.nextRoundButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if (!isItEnd()) {
-                    createRoundWindow();
-                } else {
-                    createWinnerWindow();
-                }
-
-            }
+    private void showEnd() {
+        showScoreboard();
+        out.println("");
+        out.println("");
+        out.println("WINNER !!!!!!");
+        out.println(teamsList.get(0).getName()+" with score "+teamsList.get(0).getScore());
+    }
+    /**
+     * shows help
+     */
+    private void showHelp() {
+        out.println("SHOW SCOREBOARD");
+        out.println("NEXT ROUND");
+        out.println("QUIT");
+    }
+    /**
+     * shows scoreboard
+     */
+    private void showScoreboard() {
+        out.println("name | matches | win | loose | score ");
+        teamsList.forEach(team -> {
+            out.println(team.getName() + " | " + team.getMatches() + " | " + team.getWin() + " | " + team.getLoose() + " | " + team.getScore());
         });
     }
 
     /**
-     * Open Round Window
+     * check if max round is achieved
+     * @return boolean
      */
-    private void createRoundWindow() {
-        try {
-            RoundController controller = new RoundController();
-            setControllersValue(controller);
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../View/Round.fxml"));
-            loader.setController(controller);
-            Parent root = loader.load();//FXMLLoader.load(getClass().getResource("../View/Round.fxml"));
-            root.autosize();
-            Stage stage = new Stage();
-            Scene scene = new Scene(root);
-            stage.setTitle("Round");
-            stage.setScene(scene);
-            stage.show();
-            currentRound++;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Open Winner Window
-     */
-    private void createWinnerWindow() {
-        try {
-            WinnerController winnerController = new WinnerController();
-            winnerController.setWinners(teamsList.get(0));
-            Stage mainStage = (Stage) nextRoundButton.getScene().getWindow();
-            mainStage.close();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../View/Winner.fxml"));
-            loader.setController(winnerController);
-            Parent root = loader.load();//FXMLLoader.load(getClass().getResource("../View/Round.fxml"));
-            root.autosize();
-            Stage stage = new Stage();
-            Scene scene = new Scene(root);
-            stage.setTitle("Winner");
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Setting values(teamList,scoreboard,teamPoints,currentRound) to controller
-     *
-     * @param controller RoundController
-     */
-    private void setControllersValue(RoundController controller) {
-        controller.setTeamList(teamsList);
-        controller.setViewTable(scoreboard);
-        controller.setSortColumn(teamPoints);
-        controller.setRoundNumber(currentRound);
-    }
-
-    /**
-     * Setting teams into View Table
-     */
-    private void setTable() {
-        teamName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        teamMatches.setCellValueFactory(new PropertyValueFactory<>("matches"));
-        teamWin.setCellValueFactory(new PropertyValueFactory<>("win"));
-        teamLoose.setCellValueFactory(new PropertyValueFactory<>("loose"));
-        teamPoints.setCellValueFactory(new PropertyValueFactory<>("score"));
-        this.scoreboard.setItems(this.teamsList);
-        this.scoreboard.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    private boolean maxRoundAchieved() {
+        if (currentRound > maxRound) {
+            return false;
+        } else
+            return true;
     }
 
     /**
